@@ -1,0 +1,90 @@
+hostname freertr-ce-2
+buggy
+!
+logging buffered informational 16
+!
+crypto rsakey rsa generate 2048
+!
+crypto dsakey dsa generate 1024
+!
+crypto ecdsakey ecdsa generate 256
+!
+aaa userlist usr
+ username admin
+ username admin password $v10$YWRtaW5AMTIz
+ exit
+!
+vrf definition CORE
+ exit
+!
+vrf definition OOB
+ exit
+!
+interface ethernet1
+ description To_cjunosevo-pe-2
+ no shutdown
+ no log-link-change
+ exit
+!
+interface ethernet1.100
+ description To_cjunosevo-pe-2_Vlan100
+ vrf forwarding CORE
+ ipv4 address 192.168.0.2 255.255.255.0
+ no shutdown
+ no log-link-change
+ exit
+!
+interface ethernet255
+ description MGMT
+ vrf forwarding OOB
+ ipv4 address 172.20.100.32 255.255.255.0
+ no shutdown
+ no log-link-change
+ exit
+!
+console0
+ no exec authorization
+ no login authentication
+ exit
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+server telnet OOB
+ security authentication usr
+ security rsakey rsa
+ security dsakey dsa
+ security ecdsakey ecdsa
+ second-port 22
+ exec logging
+ no exec authorization
+ login authentication usr
+ login logging
+ vrf OOB
+ exit
+!
+!
+end

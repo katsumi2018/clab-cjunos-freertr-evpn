@@ -1,0 +1,50 @@
+name: cjunosfreertr
+
+mgmt:
+  network: clab-mgmt        # docker network 名 
+  ipv4-subnet: 172.20.100.0/24
+
+topology:
+  nodes:
+    cjunosevo-pe-1:
+      kind: juniper_cjunosevolved
+      mgmt-ipv4: 172.20.100.21
+      image: cjunosevolved:25.2R1.8-EVO
+      startup-config: cjunosevo-pe-1.cfg
+      env:
+        CPTX_COSIM: "BT"
+
+    cjunosevo-pe-2:
+      kind: juniper_cjunosevolved
+      mgmt-ipv4: 172.20.100.22
+      image: cjunosevolved:25.2R1.8-EVO
+      startup-config: cjunosevo-pe-2.cfg
+      env:
+        CPTX_COSIM: "BT"
+
+    freertr-p-1:
+      kind: rare
+      mgmt-ipv4: 172.20.100.11
+      image: ghcr.io/rare-freertr/freertr-containerlab:latest
+      binds:
+        - freertr-p-1-sw.txt:/rtr/run/conf/rtr-sw.txt:ro
+
+    freertr-ce-1:
+      kind: rare
+      mgmt-ipv4: 172.20.100.31
+      image: ghcr.io/rare-freertr/freertr-containerlab:latest
+      binds:
+        - freertr-ce-1-sw.txt:/rtr/run/conf/rtr-sw.txt:ro
+
+    freertr-ce-2:
+      kind: rare
+      mgmt-ipv4: 172.20.100.32
+      image: ghcr.io/rare-freertr/freertr-containerlab:latest
+      binds:
+        - freertr-ce-2-sw.txt:/rtr/run/conf/rtr-sw.txt:ro
+
+  links:
+    - endpoints: ["freertr-p-1:eth1", "cjunosevo-pe-1:eth4"]
+    - endpoints: ["freertr-p-1:eth2", "cjunosevo-pe-2:eth4"]
+    - endpoints: ["cjunosevo-pe-1:eth5", "freertr-ce-1:eth1"]
+    - endpoints: ["cjunosevo-pe-2:eth5", "freertr-ce-2:eth1"]
